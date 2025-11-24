@@ -1,50 +1,36 @@
-export function printMultiplicationTable(numbers: Array<number>) {
-  // first, let's figure out the biggest value
-  const biggest = numbers.reduce((acc, n) => (n > acc ? n : acc));
+export function buildMatrix(numbers: number[]): number[][] {
+  return numbers.map(row =>
+    numbers.map(col => row * col)
+  );
+}
 
-  // then, find the biggest possible result to compute its magnitude
-  let biggestResult = biggest * biggest;
-  let magnitude = 0;
-  while (biggestResult > 0) {
-    magnitude++;
-    biggestResult = Math.round(biggestResult / 10);
-  }
-  magnitude++; // add an additional space for the width
+export function formatMatrix(numbers: number[], matrix: number[][]): string {
+  const maxNumber = Math.max(...numbers);
+  const maxProduct = maxNumber * maxNumber;
 
-  // finally, calculate and output the nicely formatted multiplication table
-  let titleRow = "*";
-  while (titleRow.length < magnitude) {
-    titleRow = " " + titleRow;
-  }
-  titleRow += " ||";
-  for (const n of numbers) {
-    let cell = `${n}`;
-    while (cell.length < magnitude) {
-      cell = " " + cell;
-    }
-    titleRow += `${cell} |`;
-  }
-  console.log(titleRow);
-  let sep = "";
-  for (let i = 0; i < titleRow.length; i++) {
-    sep += "=";
-  }
-  console.log(sep);
-  for (const n of numbers) {
-    let row = `${n}`;
-    while (row.length < magnitude) {
-      row = ` ${row}`;
-    }
-    row = `${row} ||`;
-    for (const m of numbers) {
-      const product = n * m;
-      let cell = `${product}`;
-      while (cell.length < magnitude) {
-        cell = ` ${cell}`;
-      }
-      cell += " |";
-      row += cell;
-    }
-    console.log(row);
-  }
+  const width = String(maxProduct).length + 1;
+
+  const header =
+    "*".padStart(width) +
+    " ||" +
+    numbers.map(n => String(n).padStart(width)).join(" |") +
+    " |";
+
+  const separator = "=".repeat(header.length);
+
+  const rows = numbers.map((rowValue, rowIndex) => {
+    const rowHeader = String(rowValue).padStart(width) + " ||";
+    const cols = matrix[rowIndex]
+      .map(v => String(v).padStart(width))
+      .join(" |");
+    return `${rowHeader}${cols} |`;
+  });
+
+  return [header, separator, ...rows].join("\n");
+}
+
+export function printMultiplicationTable(numbers: number[]): void {
+  const matrix = buildMatrix(numbers);
+  const formatted = formatMatrix(numbers, matrix);
+  console.log(formatted);
 }
